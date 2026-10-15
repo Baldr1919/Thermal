@@ -112,21 +112,15 @@ h1, h2, h3, h4, p, li, label {
     color: var(--text);
 }
 
+/* ---------------------------------------------------------
+   HEADER
+--------------------------------------------------------- */
 .hero {
     background: linear-gradient(115deg, #FFFFFF 0%, #E5F1F5 100%);
     border: 1px solid #D4E2EC;
     border-radius: 20px;
     padding: 34px;
     margin-bottom: 22px;
-}
-
-.eyebrow {
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 1.8px;
-    color: var(--teal) !important;
-    text-transform: uppercase;
-    margin-bottom: 12px;
 }
 
 .hero-title {
@@ -145,6 +139,9 @@ h1, h2, h3, h4, p, li, label {
     margin-bottom: 0;
 }
 
+/* ---------------------------------------------------------
+   SECTION HEADINGS
+--------------------------------------------------------- */
 .section-heading {
     color: var(--navy) !important;
     font-size: 23px;
@@ -160,6 +157,9 @@ h1, h2, h3, h4, p, li, label {
     margin-bottom: 18px;
 }
 
+/* ---------------------------------------------------------
+   PANELS
+--------------------------------------------------------- */
 .panel {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -181,6 +181,9 @@ h1, h2, h3, h4, p, li, label {
     color: #334155 !important;
 }
 
+/* ---------------------------------------------------------
+   INPUT LABELS
+--------------------------------------------------------- */
 div[data-testid="stWidgetLabel"] p,
 div[data-testid="stWidgetLabel"] label {
     color: #172033 !important;
@@ -188,16 +191,58 @@ div[data-testid="stWidgetLabel"] label {
     font-weight: 600 !important;
 }
 
+/* ---------------------------------------------------------
+   NUMBER INPUTS: WHITE BACKGROUND, BLACK NUMBERS
+--------------------------------------------------------- */
+div[data-testid="stNumberInput"] {
+    background: transparent !important;
+}
+
+div[data-testid="stNumberInput"] div[data-baseweb="input"] {
+    background-color: #FFFFFF !important;
+    border: 1px solid #B8C2CC !important;
+    border-radius: 9px !important;
+}
+
+div[data-testid="stNumberInput"] input {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    caret-color: #000000 !important;
+    opacity: 1 !important;
+}
+
+div[data-testid="stNumberInput"] label,
+div[data-testid="stNumberInput"] label p {
+    color: #172033 !important;
+    font-weight: 600 !important;
+}
+
+div[data-testid="stNumberInput"] button {
+    color: #172033 !important;
+    background-color: #F3F6F9 !important;
+    border-color: #D7E0EA !important;
+}
+
+div[data-testid="stNumberInput"] button:hover {
+    color: #066773 !important;
+    background-color: #E5F4F3 !important;
+}
+
+/* Fallback for other text input widgets */
 div[data-baseweb="input"] {
-    background: white !important;
+    background-color: #FFFFFF !important;
     border-radius: 9px !important;
 }
 
 div[data-baseweb="input"] input {
-    color: #172033 !important;
-    -webkit-text-fill-color: #172033 !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
 }
 
+/* ---------------------------------------------------------
+   METRICS
+--------------------------------------------------------- */
 div[data-testid="stMetric"] {
     background: #FFFFFF;
     border: 1px solid var(--border);
@@ -219,10 +264,13 @@ div[data-testid="stMetricValue"] div {
     font-weight: 800 !important;
 }
 
+/* ---------------------------------------------------------
+   BUTTONS
+--------------------------------------------------------- */
 div.stButton > button,
 div[data-testid="stFormSubmitButton"] button {
     background: var(--teal) !important;
-    color: white !important;
+    color: #FFFFFF !important;
     border: 0 !important;
     border-radius: 10px !important;
     min-height: 48px;
@@ -233,9 +281,12 @@ div[data-testid="stFormSubmitButton"] button {
 div.stButton > button:hover,
 div[data-testid="stFormSubmitButton"] button:hover {
     background: var(--teal-dark) !important;
-    color: white !important;
+    color: #FFFFFF !important;
 }
 
+/* ---------------------------------------------------------
+   ANALYTICAL EQUATION
+--------------------------------------------------------- */
 .formula-box {
     background: #FFFFFF;
     border: 1px solid var(--border);
@@ -251,12 +302,15 @@ div[data-testid="stFormSubmitButton"] button:hover {
     line-height: 1.8;
 }
 
+/* ---------------------------------------------------------
+   ALERTS AND EXPANDERS
+--------------------------------------------------------- */
 [data-testid="stAlert"] p {
     color: #172033 !important;
 }
 
 [data-testid="stExpander"] {
-    background: white;
+    background: #FFFFFF;
     border: 1px solid var(--border);
     border-radius: 10px;
 }
@@ -271,12 +325,32 @@ hr {
     border-color: #D7E0EA !important;
 }
 
+/* ---------------------------------------------------------
+   FOOTER
+--------------------------------------------------------- */
 .footer {
     text-align: center;
+    padding: 22px 12px 12px 12px;
+    line-height: 1.9;
+}
+
+.footer-title {
+    color: #17324D !important;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+.footer-subtitle {
+    color: #526477 !important;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+
+.footer-copyright {
     color: #475569 !important;
     font-size: 12px;
     line-height: 1.9;
-    padding-top: 18px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -306,17 +380,19 @@ def load_excel_data(file_bytes=None):
             + ", ".join(missing)
         )
 
-    # Keep the six model features and ensure numeric values
+    # Keep the six model features and ensure numeric values.
     X = df[FEATURES].copy()
 
     for col in FEATURES:
         X[col] = pd.to_numeric(X[col], errors="coerce")
 
-    # Rows with no feature values cannot be used as background data
+    # Remove rows where every feature is missing.
     X = X.dropna(how="all").reset_index(drop=True)
 
     if X.empty:
-        raise ValueError("No usable feature rows were found in the Excel file.")
+        raise ValueError(
+            "No usable feature rows were found in the Excel file."
+        )
 
     return X
 
@@ -325,13 +401,16 @@ def load_excel_data(file_bytes=None):
 with st.expander("Dataset source", expanded=False):
     st.write(
         "By default, the app reads Data.xlsx from the same folder as app.py. "
-        "You can optionally select another Excel file with the same six feature columns."
+        "You can optionally select another Excel file with the same six "
+        "feature columns."
     )
+
     uploaded_excel = st.file_uploader(
         "Optional Excel dataset",
         type=["xlsx"],
         help="The selected file will be used as the SHAP reference dataset."
     )
+
 
 try:
     model = load_model()
@@ -341,8 +420,9 @@ try:
     else:
         if not DATA_PATH.exists():
             st.error(
-                "Data.xlsx was not found. Add Data.xlsx to the project repository "
-                "beside app.py, or upload it using Dataset source above."
+                "Data.xlsx was not found. Add Data.xlsx to the project "
+                "repository beside app.py, or upload it using Dataset "
+                "source above."
             )
             st.stop()
 
@@ -350,8 +430,10 @@ try:
 
 except Exception as error:
     st.error("The model or reference dataset could not be loaded.")
+
     with st.expander("Technical details"):
         st.code(str(error))
+
     st.stop()
 
 
@@ -381,7 +463,8 @@ try:
 
         if transformed.ndim != 2 or transformed.shape[1] != len(FEATURES):
             raise ValueError(
-                "The preprocessed feature dimensions do not match the six input features."
+                "The preprocessed feature dimensions do not match "
+                "the six input features."
             )
 
         return pd.DataFrame(
@@ -390,10 +473,10 @@ try:
             index=X_raw.index
         )
 
-    # SHAP background uses the actual reference dataset after preprocessing.
+    # SHAP background uses the reference dataset after preprocessing.
     X_background = transform_features(X_reference_raw)
 
-    # Use the same transformed feature space as the underlying tree estimator.
+    # Explain the underlying tree estimator in its transformed feature space.
     explainer = shap.TreeExplainer(
         estimator,
         data=X_background,
@@ -402,8 +485,10 @@ try:
 
 except Exception as error:
     st.error("SHAP initialization failed.")
+
     with st.expander("Technical details"):
         st.code(str(error))
+
     st.stop()
 
 
@@ -412,10 +497,11 @@ except Exception as error:
 # =========================================================
 st.markdown("""
 <div class="hero">
-    <div class="eyebrow">GEOTECHNICAL ENGINEERING · RESEARCH APPLICATION</div>
     <div class="hero-title">
-        Soil Thermal Conductivity<br>Prediction & Explainability
+        Soil Thermal Conductivity<br>
+        Prediction &amp; Explainability
     </div>
+
     <p class="hero-description">
         This application estimates soil thermal conductivity using a trained
         Gradient Boosting model and a proposed analytical equation.
@@ -426,23 +512,33 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+
+# =========================================================
+# 8. HOW TO USE THE APPLICATION
+# =========================================================
 st.markdown("""
 <div class="panel">
     <div class="panel-title">How to use the application</div>
+
     <div class="panel-text">
-        <b>1.</b> Enter the six soil properties using the same units and scales
-        as the model's training dataset.<br>
+        <b>1.</b> Enter the six soil properties using the same units and
+        scales as the model's training dataset. Brief statistical
+        information about the reference dataset is provided at the
+        end of this application.<br>
+
         <b>2.</b> Run the prediction to calculate the ML estimate and the
         analytical-equation estimate.<br>
-        <b>3.</b> Inspect the SHAP Waterfall plot to understand which features
-        increase or decrease the ML prediction for this specific sample.
+
+        <b>3.</b> Inspect the SHAP Waterfall plot to understand which
+        features increase or decrease the ML prediction for this
+        specific sample.
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 
 # =========================================================
-# 8. INPUT FORM
+# 9. INPUT FORM
 # =========================================================
 st.markdown(
     '<div class="section-heading">01 | Soil Properties</div>',
@@ -451,18 +547,25 @@ st.markdown(
 
 st.markdown(
     '<div class="section-description">'
-    'The example values are initialized from the medians of the reference dataset. '
-    'Adjust them to describe the sample you want to evaluate.'
+    'The example values are initialized from the medians of the reference '
+    'dataset. Adjust them to describe the sample you want to evaluate.'
     '</div>',
     unsafe_allow_html=True
 )
 
+
+# Initialize the inputs from the reference dataset medians.
 defaults = {}
+
 for col in FEATURES:
     valid_values = X_reference_raw[col].dropna()
+
     defaults[col] = (
-        float(valid_values.median()) if not valid_values.empty else 0.0
+        float(valid_values.median())
+        if not valid_values.empty
+        else 0.0
     )
+
 
 with st.form("soil_prediction_form"):
     c1, c2, c3 = st.columns(3)
@@ -519,7 +622,7 @@ with st.form("soil_prediction_form"):
 
 
 # =========================================================
-# 9. PREDICTIONS AND SHAP WATERFALL
+# 10. PREDICTIONS AND SHAP WATERFALL
 # =========================================================
 if submitted:
 
@@ -534,12 +637,12 @@ if submitted:
 
     try:
         # -------------------------------------------------
-        # 9.1 ML prediction from the full saved pipeline
+        # 10.1 ML prediction from the full saved pipeline
         # -------------------------------------------------
         ml_prediction = float(model.predict(input_data)[0])
 
         # -------------------------------------------------
-        # 9.2 Analytical equation
+        # 10.2 Analytical equation
         # -------------------------------------------------
         equation_prediction = (
             2.740221
@@ -552,7 +655,7 @@ if submitted:
         )
 
         # -------------------------------------------------
-        # 9.3 Transform this sample using saved preprocessing
+        # 10.3 Transform this sample using saved preprocessing
         # -------------------------------------------------
         X_sample_transformed = transform_features(input_data)
 
@@ -573,11 +676,14 @@ if submitted:
                 '<div class="eyebrow">MODEL 01</div>',
                 unsafe_allow_html=True
             )
+
             st.markdown("**Machine Learning**")
+
             st.metric(
                 "Predicted thermal conductivity",
                 f"{ml_prediction:.6f}"
             )
+
             st.markdown(
                 '<p class="small-note">'
                 'Output from the saved Gradient Boosting pipeline.'
@@ -590,11 +696,14 @@ if submitted:
                 '<div class="eyebrow">MODEL 02</div>',
                 unsafe_allow_html=True
             )
+
             st.markdown("**Analytical Equation**")
+
             st.metric(
                 "Predicted thermal conductivity",
                 f"{equation_prediction:.6f}"
             )
+
             st.markdown(
                 '<p class="small-note">'
                 'Output from the proposed quadratic equation.'
@@ -635,12 +744,14 @@ if submitted:
             )
 
         # -------------------------------------------------
-        # 9.4 SHAP WATERFALL PLOT
+        # 10.4 SHAP WATERFALL PLOT
         # -------------------------------------------------
         st.divider()
 
         st.markdown(
-            '<div class="section-heading">03 | SHAP Waterfall Explanation</div>',
+            '<div class="section-heading">'
+            '03 | SHAP Waterfall Explanation'
+            '</div>',
             unsafe_allow_html=True
         )
 
@@ -654,11 +765,10 @@ if submitted:
         """, unsafe_allow_html=True)
 
         # Explain only this new sample.
-        # With interventional TreeExplainer, the baseline is based on
-        # the reference dataset supplied to the explainer.
+        # The baseline is based on the reference dataset.
         sample_explanation = shap_explanation[0]
 
-        fig = plt.figure(figsize=(11, 6.5), facecolor="white")
+        plt.figure(figsize=(11, 6.5), facecolor="white")
 
         shap.plots.waterfall(
             sample_explanation,
@@ -676,7 +786,12 @@ if submitted:
         fig.patch.set_facecolor("white")
 
         # Improve typography and remove unnecessary borders.
-        ax.tick_params(axis="both", labelsize=10, colors="#172033")
+        ax.tick_params(
+            axis="both",
+            labelsize=10,
+            colors="#172033"
+        )
+
         for spine in ax.spines.values():
             spine.set_visible(False)
 
@@ -688,13 +803,17 @@ if submitted:
         st.markdown("""
         <div class="panel">
             <div class="panel-title">How to interpret the plot</div>
+
             <div class="panel-text">
                 <b>Baseline:</b> the reference prediction derived from the
                 background data used by the SHAP explainer.<br>
+
                 <b>Positive SHAP value:</b> a feature contribution that raises
                 the prediction relative to the baseline.<br>
+
                 <b>Negative SHAP value:</b> a feature contribution that lowers
                 the prediction relative to the baseline.<br>
+
                 <b>Final output:</b> the baseline plus all SHAP contributions,
                 which should reproduce the underlying estimator's output
                 up to numerical tolerance.
@@ -703,23 +822,27 @@ if submitted:
         """, unsafe_allow_html=True)
 
         st.caption(
-            "The Waterfall plot explains the ML model, not the analytical equation. "
-            "SHAP contributions depend on the model, sample, and reference data."
+            "The Waterfall plot explains the ML model, not the analytical "
+            "equation. SHAP contributions depend on the model, sample, "
+            "and reference data."
         )
 
     except Exception as error:
         st.error("Prediction or SHAP explanation failed.")
+
         with st.expander("Technical details"):
             st.code(str(error))
 
 
 # =========================================================
-# 10. ANALYTICAL EQUATION
+# 11. ANALYTICAL EQUATION
 # =========================================================
 st.divider()
 
 st.markdown(
-    '<div class="section-heading">04 | Proposed Analytical Equation</div>',
+    '<div class="section-heading">'
+    '04 | Proposed Analytical Equation'
+    '</div>',
     unsafe_allow_html=True
 )
 
@@ -730,7 +853,10 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="formula-box">', unsafe_allow_html=True)
+st.markdown(
+    '<div class="formula-box">',
+    unsafe_allow_html=True
+)
 
 st.latex(
     r"""
@@ -753,6 +879,7 @@ st.markdown("""
     <b>Q</b>: quartz content<br>
     <b>S</b>: saturation degree<br>
     <b>n</b>: porosity<br><br>
+
     <b>Scale requirement:</b> Enter the variables on the same numerical
     scales used to develop the equation. For example, fractions and percentages
     are not interchangeable.
@@ -763,12 +890,33 @@ st.markdown("</div>", unsafe_allow_html=True)
 
 
 # =========================================================
-# 11. REFERENCE DATA AND MODEL NOTES
+# 12. REFERENCE DATA AND MODEL NOTES
 # =========================================================
 with st.expander("Reference dataset and model details"):
 
     st.write(f"Reference dataset rows: {len(X_reference_raw)}")
     st.write(f"Number of input features: {len(FEATURES)}")
+
+    st.markdown("**Brief statistical summary of the reference dataset**")
+
+    # Summary statistics for the six input features.
+    summary_table = X_reference_raw[FEATURES].describe().T
+
+    summary_table = summary_table.rename(columns={
+        "count": "Count",
+        "mean": "Mean",
+        "std": "Standard deviation",
+        "min": "Minimum",
+        "25%": "25th percentile",
+        "50%": "Median",
+        "75%": "75th percentile",
+        "max": "Maximum",
+    })
+
+    st.dataframe(
+        summary_table.round(6),
+        use_container_width=True
+    )
 
     st.markdown("**Feature ranges in the reference dataset**")
 
@@ -786,7 +934,7 @@ with st.expander("Reference dataset and model details"):
     })
 
     st.dataframe(
-        range_table,
+        range_table.round(6),
         use_container_width=True,
         hide_index=True
     )
@@ -803,13 +951,26 @@ with st.expander("Reference dataset and model details"):
 
 
 # =========================================================
-# 12. FOOTER
+# 13. FOOTER AND COPYRIGHT
 # =========================================================
 st.divider()
 
 st.markdown("""
 <div class="footer">
-    Soil Thermal Conductivity Prediction & Explainability<br>
-    Gradient Boosting · Analytical Modeling · SHAP
+
+    <div class="footer-title">
+        Soil Thermal Conductivity Prediction &amp; Explainability
+    </div>
+
+    <div class="footer-subtitle">
+        Gradient Boosting · Analytical Modeling · SHAP
+    </div>
+
+    <div class="footer-copyright">
+        Copyright © 2026 Faculty of Civil, Water and Environmental
+        Engineering, Shahid Beheshti University.<br>
+        Research team of Dr. Mohammadnezhad.
+    </div>
+
 </div>
 """, unsafe_allow_html=True)
