@@ -816,19 +816,19 @@ st.divider()
 
 st.markdown("""
 <div class="footer">
-    <div class="footer-title">
+    <p style="font-weight: 800; font-size: 15px; color: #17324D;">
         Soil Thermal Conductivity Prediction &amp; Explainability
-    </div>
-
-    <div class="footer-affiliation">
-        Gradient Boosting &middot; Analytical Modeling &middot; SHAP<br><br>
+    </p>
+    <p style="color: #475569; font-size: 12px; line-height: 1.9;">
+        Gradient Boosting &middot; Analytical Modeling &middot; SHAP
+    </p>
+    <p style="color: #475569; font-size: 12px; line-height: 1.9;">
         Faculty of Civil, Water and Environmental Engineering<br>
         Shahid Beheshti University<br>
         Dr. Mohammadnezhad's Research Team
-    </div>
-
-    <div class="footer-copyright">
+    </p>
+    <p style="color: #64748B; font-size: 11px;">
         &copy; Shahid Beheshti University &mdash; Research Application
-    </div>
+    </p>
 </div>
 """, unsafe_allow_html=True)
