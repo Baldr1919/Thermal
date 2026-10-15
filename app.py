@@ -1,5 +1,6 @@
 
 from pathlib import Path
+from io import BytesIO
 
 import joblib
 import matplotlib.pyplot as plt
@@ -48,7 +49,7 @@ FEATURE_HELP = {
 
 
 # =========================================================
-# 3. PROFESSIONAL MATPLOTLIB DEFAULTS
+# 3. MATPLOTLIB DEFAULTS
 # =========================================================
 plt.rcParams.update({
     "font.family": "DejaVu Sans",
@@ -83,8 +84,6 @@ st.markdown("""
     --navy: #17324D;
     --teal: #087F8C;
     --teal-dark: #066773;
-    --soft-teal: #E5F4F3;
-    --soft-blue: #EAF0F8;
 }
 
 .stApp {
@@ -112,9 +111,7 @@ h1, h2, h3, h4, p, li, label {
     color: var(--text);
 }
 
-/* ---------------------------------------------------------
-   HEADER
---------------------------------------------------------- */
+/* HEADER */
 .hero {
     background: linear-gradient(115deg, #FFFFFF 0%, #E5F1F5 100%);
     border: 1px solid #D4E2EC;
@@ -126,7 +123,7 @@ h1, h2, h3, h4, p, li, label {
 .hero-title {
     font-size: clamp(28px, 4vw, 40px);
     font-weight: 800;
-    line-height: 1.2;
+    line-height: 1.25;
     color: var(--navy) !important;
     margin-bottom: 14px;
 }
@@ -139,9 +136,7 @@ h1, h2, h3, h4, p, li, label {
     margin-bottom: 0;
 }
 
-/* ---------------------------------------------------------
-   SECTION HEADINGS
---------------------------------------------------------- */
+/* SECTION HEADINGS */
 .section-heading {
     color: var(--navy) !important;
     font-size: 23px;
@@ -157,9 +152,7 @@ h1, h2, h3, h4, p, li, label {
     margin-bottom: 18px;
 }
 
-/* ---------------------------------------------------------
-   PANELS
---------------------------------------------------------- */
+/* PANELS */
 .panel {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -177,13 +170,11 @@ h1, h2, h3, h4, p, li, label {
 
 .panel-text {
     font-size: 13px;
-    line-height: 1.85;
+    line-height: 1.9;
     color: #334155 !important;
 }
 
-/* ---------------------------------------------------------
-   INPUT LABELS
---------------------------------------------------------- */
+/* INPUT LABELS */
 div[data-testid="stWidgetLabel"] p,
 div[data-testid="stWidgetLabel"] label {
     color: #172033 !important;
@@ -191,9 +182,7 @@ div[data-testid="stWidgetLabel"] label {
     font-weight: 600 !important;
 }
 
-/* ---------------------------------------------------------
-   NUMBER INPUTS: WHITE BACKGROUND, BLACK NUMBERS
---------------------------------------------------------- */
+/* NUMBER INPUTS: WHITE BACKGROUND, BLACK TEXT */
 div[data-testid="stNumberInput"] {
     background: transparent !important;
 }
@@ -229,7 +218,7 @@ div[data-testid="stNumberInput"] button:hover {
     background-color: #E5F4F3 !important;
 }
 
-/* Fallback for other text input widgets */
+/* GENERAL INPUT FALLBACK */
 div[data-baseweb="input"] {
     background-color: #FFFFFF !important;
     border-radius: 9px !important;
@@ -240,9 +229,7 @@ div[data-baseweb="input"] input {
     -webkit-text-fill-color: #000000 !important;
 }
 
-/* ---------------------------------------------------------
-   METRICS
---------------------------------------------------------- */
+/* METRICS */
 div[data-testid="stMetric"] {
     background: #FFFFFF;
     border: 1px solid var(--border);
@@ -264,9 +251,7 @@ div[data-testid="stMetricValue"] div {
     font-weight: 800 !important;
 }
 
-/* ---------------------------------------------------------
-   BUTTONS
---------------------------------------------------------- */
+/* BUTTONS */
 div.stButton > button,
 div[data-testid="stFormSubmitButton"] button {
     background: var(--teal) !important;
@@ -284,9 +269,7 @@ div[data-testid="stFormSubmitButton"] button:hover {
     color: #FFFFFF !important;
 }
 
-/* ---------------------------------------------------------
-   ANALYTICAL EQUATION
---------------------------------------------------------- */
+/* FORMULA */
 .formula-box {
     background: #FFFFFF;
     border: 1px solid var(--border);
@@ -302,13 +285,12 @@ div[data-testid="stFormSubmitButton"] button:hover {
     line-height: 1.8;
 }
 
-/* ---------------------------------------------------------
-   ALERTS AND EXPANDERS
---------------------------------------------------------- */
+/* ALERTS */
 [data-testid="stAlert"] p {
     color: #172033 !important;
 }
 
+/* EXPANDERS */
 [data-testid="stExpander"] {
     background: #FFFFFF;
     border: 1px solid var(--border);
@@ -321,13 +303,12 @@ div[data-testid="stFormSubmitButton"] button:hover {
     font-weight: 600;
 }
 
+/* DIVIDERS */
 hr {
     border-color: #D7E0EA !important;
 }
 
-/* ---------------------------------------------------------
-   FOOTER
---------------------------------------------------------- */
+/* FOOTER */
 .footer {
     text-align: center;
     padding: 22px 12px 12px 12px;
@@ -367,7 +348,6 @@ def load_model():
 @st.cache_data
 def load_excel_data(file_bytes=None):
     if file_bytes is not None:
-        from io import BytesIO
         df = pd.read_excel(BytesIO(file_bytes))
     else:
         df = pd.read_excel(DATA_PATH)
@@ -376,17 +356,15 @@ def load_excel_data(file_bytes=None):
 
     if missing:
         raise ValueError(
-            "The following required columns are missing from Data.xlsx: "
+            "The following required columns are missing from the dataset: "
             + ", ".join(missing)
         )
 
-    # Keep the six model features and ensure numeric values.
     X = df[FEATURES].copy()
 
     for col in FEATURES:
         X[col] = pd.to_numeric(X[col], errors="coerce")
 
-    # Remove rows where every feature is missing.
     X = X.dropna(how="all").reset_index(drop=True)
 
     if X.empty:
@@ -397,18 +375,19 @@ def load_excel_data(file_bytes=None):
     return X
 
 
-# Optional upload, useful if the dataset is not bundled with the app.
+# Optional dataset upload
 with st.expander("Dataset source", expanded=False):
     st.write(
         "By default, the app reads Data.xlsx from the same folder as app.py. "
-        "You can optionally select another Excel file with the same six "
-        "feature columns."
+        "You can optionally select another Excel file containing the same "
+        "six feature columns. The selected dataset is also used as the "
+        "SHAP reference dataset."
     )
 
     uploaded_excel = st.file_uploader(
         "Optional Excel dataset",
         type=["xlsx"],
-        help="The selected file will be used as the SHAP reference dataset."
+        help="Select an Excel file containing all six model features."
     )
 
 
@@ -421,8 +400,7 @@ try:
         if not DATA_PATH.exists():
             st.error(
                 "Data.xlsx was not found. Add Data.xlsx to the project "
-                "repository beside app.py, or upload it using Dataset "
-                "source above."
+                "repository beside app.py, or upload it using Dataset source."
             )
             st.stop()
 
@@ -438,11 +416,9 @@ except Exception as error:
 
 
 # =========================================================
-# 6. GET THE PREPROCESSOR AND TREE ESTIMATOR
+# 6. PREPROCESSOR AND TREE ESTIMATOR FOR SHAP
 # =========================================================
 try:
-    # The saved PyCaret pipeline contains preprocessing steps
-    # followed by GradientBoostingRegressor.
     estimator = model.steps[-1][1]
     preprocessor = model[:-1]
 
@@ -453,7 +429,7 @@ try:
         )
 
     def transform_features(X_raw):
-        """Apply the saved pipeline preprocessing without predicting."""
+        """Apply the saved preprocessing steps without predicting."""
         transformed = preprocessor.transform(X_raw)
 
         if hasattr(transformed, "toarray"):
@@ -473,10 +449,8 @@ try:
             index=X_raw.index
         )
 
-    # SHAP background uses the reference dataset after preprocessing.
     X_background = transform_features(X_reference_raw)
 
-    # Explain the underlying tree estimator in its transformed feature space.
     explainer = shap.TreeExplainer(
         estimator,
         data=X_background,
@@ -524,10 +498,10 @@ st.markdown("""
         <b>1.</b> Enter the six soil properties using the same units and
         scales as the model's training dataset. Brief statistical
         information about the reference dataset is provided at the
-        end of this application.<br>
+        end of this application.<br><br>
 
         <b>2.</b> Run the prediction to calculate the ML estimate and the
-        analytical-equation estimate.<br>
+        analytical-equation estimate.<br><br>
 
         <b>3.</b> Inspect the SHAP Waterfall plot to understand which
         features increase or decrease the ML prediction for this
@@ -553,8 +527,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
-# Initialize the inputs from the reference dataset medians.
 defaults = {}
 
 for col in FEATURES:
@@ -636,14 +608,10 @@ if submitted:
     }], columns=FEATURES)
 
     try:
-        # -------------------------------------------------
-        # 10.1 ML prediction from the full saved pipeline
-        # -------------------------------------------------
+        # 10.1 Machine Learning prediction
         ml_prediction = float(model.predict(input_data)[0])
 
-        # -------------------------------------------------
         # 10.2 Analytical equation
-        # -------------------------------------------------
         equation_prediction = (
             2.740221
             - 0.598635 * quartz_content
@@ -654,12 +622,8 @@ if submitted:
             + 6.718210 * porosity**2
         )
 
-        # -------------------------------------------------
-        # 10.3 Transform this sample using saved preprocessing
-        # -------------------------------------------------
+        # 10.3 SHAP explanation
         X_sample_transformed = transform_features(input_data)
-
-        # SHAP values explain the underlying tree estimator.
         shap_explanation = explainer(X_sample_transformed)
 
         st.divider()
@@ -743,9 +707,7 @@ if submitted:
                 hide_index=True
             )
 
-        # -------------------------------------------------
         # 10.4 SHAP WATERFALL PLOT
-        # -------------------------------------------------
         st.divider()
 
         st.markdown(
@@ -759,16 +721,12 @@ if submitted:
         <div class="section-description">
             This plot explains the Machine Learning prediction for the
             selected sample. Features that push the prediction higher
-            move it away from the baseline in the positive direction;
-            features that push it lower move it in the negative direction.
+            move it in the positive direction; features that push it lower
+            move it in the negative direction.
         </div>
         """, unsafe_allow_html=True)
 
-        # Explain only this new sample.
-        # The baseline is based on the reference dataset.
         sample_explanation = shap_explanation[0]
-
-        plt.figure(figsize=(11, 6.5), facecolor="white")
 
         shap.plots.waterfall(
             sample_explanation,
@@ -779,13 +737,11 @@ if submitted:
         fig = plt.gcf()
         ax = plt.gca()
 
-        # Remove grid lines and keep the plot clean.
         ax.grid(False)
         ax.set_axisbelow(False)
         ax.set_facecolor("white")
         fig.patch.set_facecolor("white")
 
-        # Improve typography and remove unnecessary borders.
         ax.tick_params(
             axis="both",
             labelsize=10,
@@ -795,6 +751,7 @@ if submitted:
         for spine in ax.spines.values():
             spine.set_visible(False)
 
+        fig.set_size_inches(11, 6.5)
         fig.tight_layout()
 
         st.pyplot(fig, use_container_width=True)
@@ -899,7 +856,6 @@ with st.expander("Reference dataset and model details"):
 
     st.markdown("**Brief statistical summary of the reference dataset**")
 
-    # Summary statistics for the six input features.
     summary_table = X_reference_raw[FEATURES].describe().T
 
     summary_table = summary_table.rename(columns={
@@ -967,7 +923,7 @@ st.markdown("""
     </div>
 
     <div class="footer-copyright">
-        Copyright © 2026 Faculty of Civil, Water and Environmental
+        Copyright &copy; 2026 Faculty of Civil, Water and Environmental
         Engineering, Shahid Beheshti University.<br>
         Research team of Dr. Mohammadnezhad.
     </div>
